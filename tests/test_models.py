@@ -6,7 +6,7 @@ Tests for TodoItem class, Priority and Status enums.
 import pytest
 from datetime import datetime
 from uuid import UUID
-from src.models import TodoItem, Priority, Status
+from src.models import TodoItem, Priority, Status, User
 
 
 class TestPriorityEnum:
@@ -64,6 +64,57 @@ class TestStatusEnum:
         """Test that invalid status raises ValueError."""
         with pytest.raises(ValueError):
             Status("INVALID")
+
+
+class TestUser:
+    """Test cases for User class."""
+
+    def test_user_default_creation(self):
+        """Test that User can be created with default values."""
+        user = User()
+        assert user.username == ""
+        assert user.password == ""
+
+    def test_user_with_username_and_password(self):
+        """Test creating User with username and password."""
+        user = User(username="john_doe", password="secret123")
+        assert user.username == "john_doe"
+        assert user.password == "secret123"
+
+    def test_user_to_dict(self):
+        """Test that to_dict returns correct dictionary."""
+        user = User(username="jane_doe", password="pass456")
+        result = user.to_dict()
+        assert result == {"username": "jane_doe", "password": "pass456"}
+        assert isinstance(result, dict)
+
+    def test_user_from_dict(self):
+        """Test creating User from dictionary."""
+        data = {"username": "alice", "password": "pwd789"}
+        user = User.from_dict(data)
+        assert user.username == "alice"
+        assert user.password == "pwd789"
+
+    def test_user_from_dict_missing_fields(self):
+        """Test creating User from dictionary with missing fields."""
+        data = {"username": "bob"}
+        user = User.from_dict(data)
+        assert user.username == "bob"
+        assert user.password == ""
+
+    def test_user_from_dict_empty(self):
+        """Test creating User from empty dictionary."""
+        user = User.from_dict({})
+        assert user.username == ""
+        assert user.password == ""
+
+    def test_user_round_trip(self):
+        """Test to_dict and from_dict round trip."""
+        original = User(username="test_user", password="test_pass")
+        data = original.to_dict()
+        restored = User.from_dict(data)
+        assert restored.username == original.username
+        assert restored.password == original.password
 
 
 class TestTodoItemDefaults:
