@@ -38,3 +38,29 @@ Stored in `todos.json`. Note that `id` must be unique (UUID).
 - [ ] **2. CLI Interface - Basic Interaction**
     - Implement a main application loop.
     - Create a "Pre-Login" menu: Options for [1] Login, [2] Sign Up, [3] Exit.
+
+- [ ] **3. Create and edit a to-do-list item**
+
+- [ ] **4. View all to-do-list items**
+
+- [ ] **5.View to-do-list item details**
+    - Title
+    - Details
+    - Priority (high, low, mid)
+    - Status (completed, pending)
+    - Owner
+    - Updated date
+    - Created date
+    In this format Stored in `todos.json`. Note that `id` must be unique (UUID).
+    {
+      "id": "uuid-string",
+      "title": "String",
+      "details": "String",
+      "priority": "HIGH | MID | LOW",
+      "status": "PENDING | COMPLETED",
+      "owner": "username_string",
+      "created_at": "ISO-8601 String",
+      "updated_at": "ISO-8601 String"
+    }
+
+- [ ] **6.Mark a to-do-list item as completed**
