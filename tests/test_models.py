@@ -445,3 +445,439 @@ class TestViewAllTodoItems:
         todos = [TodoItem.from_dict(t) for t in todos_data if t.get("owner") == "user1"]
         assert len(todos) == 1
         assert todos[0].details == long_details
+
+
+class TestCreateTodoItem:
+    """Test cases for creating a to-do-list item (Task 3)."""
+
+    def test_create_todo_with_title_only(self):
+        """Test creating a todo with only title specified."""
+        todo = TodoItem(
+            title="Buy groceries",
+            created_at="2024-01-01T10:00:00",
+            updated_at="2024-01-01T10:00:00"
+        )
+        assert todo.title == "Buy groceries"
+        assert todo.priority == Priority.MID
+        assert todo.status == Status.PENDING
+
+    def test_create_todo_with_title_and_details(self):
+        """Test creating a todo with title and details."""
+        todo = TodoItem(
+            title="Complete report",
+            details="Finish Q1 quarterly report",
+            created_at="2024-01-01T10:00:00",
+            updated_at="2024-01-01T10:00:00"
+        )
+        assert todo.title == "Complete report"
+        assert todo.details == "Finish Q1 quarterly report"
+
+    def test_create_todo_with_priority_high(self):
+        """Test creating a todo with HIGH priority."""
+        todo = TodoItem(
+            title="Urgent task",
+            priority=Priority.HIGH,
+            created_at="2024-01-01T10:00:00",
+            updated_at="2024-01-01T10:00:00"
+        )
+        assert todo.priority == Priority.HIGH
+        assert todo.title == "Urgent task"
+
+    def test_create_todo_with_priority_mid(self):
+        """Test creating a todo with MID priority."""
+        todo = TodoItem(
+            title="Normal task",
+            priority=Priority.MID,
+            created_at="2024-01-01T10:00:00",
+            updated_at="2024-01-01T10:00:00"
+        )
+        assert todo.priority == Priority.MID
+
+    def test_create_todo_with_priority_low(self):
+        """Test creating a todo with LOW priority."""
+        todo = TodoItem(
+            title="Low priority task",
+            priority=Priority.LOW,
+            created_at="2024-01-01T10:00:00",
+            updated_at="2024-01-01T10:00:00"
+        )
+        assert todo.priority == Priority.LOW
+
+    def test_create_todo_with_owner(self):
+        """Test creating a todo with owner field."""
+        todo = TodoItem(
+            title="Team task",
+            owner="john_doe",
+            created_at="2024-01-01T10:00:00",
+            updated_at="2024-01-01T10:00:00"
+        )
+        assert todo.owner == "john_doe"
+
+    def test_create_todo_with_all_fields(self):
+        """Test creating a todo with all fields specified."""
+        todo = TodoItem(
+            id="custom-id-123",
+            title="Complete project",
+            details="Finish the development project",
+            priority=Priority.HIGH,
+            status=Status.PENDING,
+            owner="alice",
+            created_at="2024-01-01T10:00:00",
+            updated_at="2024-01-01T10:00:00"
+        )
+        assert todo.id == "custom-id-123"
+        assert todo.title == "Complete project"
+        assert todo.details == "Finish the development project"
+        assert todo.priority == Priority.HIGH
+        assert todo.status == Status.PENDING
+        assert todo.owner == "alice"
+
+    def test_create_todo_generates_unique_id_when_not_specified(self):
+        """Test that each created todo gets a unique ID when not specified."""
+        todo1 = TodoItem(
+            title="Task 1",
+            created_at="2024-01-01T10:00:00",
+            updated_at="2024-01-01T10:00:00"
+        )
+        todo2 = TodoItem(
+            title="Task 2",
+            created_at="2024-01-01T10:00:00",
+            updated_at="2024-01-01T10:00:00"
+        )
+        assert todo1.id != todo2.id
+        assert len(todo1.id) == 36
+
+    def test_create_todo_with_empty_title(self):
+        """Test creating a todo with empty title."""
+        todo = TodoItem(
+            title="",
+            created_at="2024-01-01T10:00:00",
+            updated_at="2024-01-01T10:00:00"
+        )
+        assert todo.title == ""
+        assert todo.status == Status.PENDING
+
+    def test_create_todo_with_special_characters(self):
+        """Test creating a todo with special characters in title."""
+        special_title = "Task: #1 @Home (Urgent!) & Important"
+        todo = TodoItem(
+            title=special_title,
+            created_at="2024-01-01T10:00:00",
+            updated_at="2024-01-01T10:00:00"
+        )
+        assert todo.title == special_title
+
+    def test_create_todo_with_multiline_details(self):
+        """Test creating a todo with multiline details."""
+        multiline_details = "Line 1\nLine 2\nLine 3"
+        todo = TodoItem(
+            title="Multiline",
+            details=multiline_details,
+            created_at="2024-01-01T10:00:00",
+            updated_at="2024-01-01T10:00:00"
+        )
+        assert todo.details == multiline_details
+
+    def test_create_todo_with_unicode_characters(self):
+        """Test creating a todo with unicode characters."""
+        unicode_title = "Buy milk 🥛 and eggs 🥚"
+        todo = TodoItem(
+            title=unicode_title,
+            created_at="2024-01-01T10:00:00",
+            updated_at="2024-01-01T10:00:00"
+        )
+        assert todo.title == unicode_title
+
+    def test_create_multiple_todos_for_same_owner(self):
+        """Test creating multiple todos for the same owner."""
+        owner = "alice"
+        todos = [
+            TodoItem(title="Task 1", owner=owner, created_at="2024-01-01T10:00:00", updated_at="2024-01-01T10:00:00"),
+            TodoItem(title="Task 2", owner=owner, created_at="2024-01-01T10:00:00", updated_at="2024-01-01T10:00:00"),
+            TodoItem(title="Task 3", owner=owner, created_at="2024-01-01T10:00:00", updated_at="2024-01-01T10:00:00"),
+        ]
+        assert len(todos) == 3
+        assert all(t.owner == owner for t in todos)
+
+
+class TestEditTodoItem:
+    """Test cases for editing a to-do-list item (Task 3)."""
+
+    def test_edit_todo_title(self):
+        """Test editing the title of a todo."""
+        todo = TodoItem(
+            title="Old Title",
+            owner="user1",
+            created_at="2024-01-01T10:00:00",
+            updated_at="2024-01-01T10:00:00"
+        )
+        todo.title = "New Title"
+        assert todo.title == "New Title"
+
+    def test_edit_todo_details(self):
+        """Test editing the details of a todo."""
+        todo = TodoItem(
+            title="Test",
+            details="Old details",
+            owner="user1",
+            created_at="2024-01-01T10:00:00",
+            updated_at="2024-01-01T10:00:00"
+        )
+        todo.details = "New details"
+        assert todo.details == "New details"
+
+    def test_edit_todo_priority_from_low_to_high(self):
+        """Test editing the priority of a todo from LOW to HIGH."""
+        todo = TodoItem(
+            title="Test",
+            priority=Priority.LOW,
+            owner="user1",
+            created_at="2024-01-01T10:00:00",
+            updated_at="2024-01-01T10:00:00"
+        )
+        assert todo.priority == Priority.LOW
+        todo.priority = Priority.HIGH
+        assert todo.priority == Priority.HIGH
+
+    def test_edit_todo_priority_from_mid_to_low(self):
+        """Test editing the priority of a todo from MID to LOW."""
+        todo = TodoItem(
+            title="Test",
+            priority=Priority.MID,
+            created_at="2024-01-01T10:00:00",
+            updated_at="2024-01-01T10:00:00"
+        )
+        todo.priority = Priority.LOW
+        assert todo.priority == Priority.LOW
+
+    def test_edit_todo_status_pending_to_completed(self):
+        """Test editing the status of a todo from PENDING to COMPLETED."""
+        todo = TodoItem(
+            title="Test",
+            status=Status.PENDING,
+            owner="user1",
+            created_at="2024-01-01T10:00:00",
+            updated_at="2024-01-01T10:00:00"
+        )
+        assert todo.status == Status.PENDING
+        todo.status = Status.COMPLETED
+        assert todo.status == Status.COMPLETED
+
+    def test_edit_todo_status_completed_to_pending(self):
+        """Test editing the status of a todo from COMPLETED back to PENDING."""
+        todo = TodoItem(
+            title="Test",
+            status=Status.COMPLETED,
+            created_at="2024-01-01T10:00:00",
+            updated_at="2024-01-01T10:00:00"
+        )
+        todo.status = Status.PENDING
+        assert todo.status == Status.PENDING
+
+    def test_edit_todo_owner(self):
+        """Test editing the owner of a todo."""
+        todo = TodoItem(
+            title="Test",
+            owner="user1",
+            created_at="2024-01-01T10:00:00",
+            updated_at="2024-01-01T10:00:00"
+        )
+        todo.owner = "user2"
+        assert todo.owner == "user2"
+
+    def test_edit_todo_updated_at_timestamp(self):
+        """Test manually updating the updated_at timestamp."""
+        todo = TodoItem(
+            title="Test",
+            updated_at="2024-01-01T10:00:00",
+            created_at="2024-01-01T10:00:00"
+        )
+        todo.updated_at = "2024-01-02T15:30:00"
+        assert todo.updated_at == "2024-01-02T15:30:00"
+
+    def test_edit_multiple_fields_simultaneously(self):
+        """Test editing multiple fields at once."""
+        todo = TodoItem(
+            title="Old Title",
+            details="Old details",
+            priority=Priority.LOW,
+            status=Status.PENDING,
+            owner="user1",
+            created_at="2024-01-01T10:00:00",
+            updated_at="2024-01-01T10:00:00"
+        )
+        
+        todo.title = "New Title"
+        todo.details = "New details"
+        todo.priority = Priority.HIGH
+        todo.status = Status.COMPLETED
+        
+        assert todo.title == "New Title"
+        assert todo.details == "New details"
+        assert todo.priority == Priority.HIGH
+        assert todo.status == Status.COMPLETED
+        assert todo.owner == "user1"
+
+    def test_edit_todo_preserves_id(self):
+        """Test that editing a todo preserves its ID."""
+        original_id = "test-id-123"
+        todo = TodoItem(
+            id=original_id,
+            title="Original",
+            created_at="2024-01-01T10:00:00",
+            updated_at="2024-01-01T10:00:00"
+        )
+        todo.title = "Edited"
+        assert todo.id == original_id
+
+    def test_edit_todo_preserves_created_at(self):
+        """Test that editing a todo preserves created_at timestamp."""
+        created_time = "2024-01-01T10:00:00"
+        todo = TodoItem(
+            title="Original",
+            created_at=created_time,
+            updated_at="2024-01-01T10:00:00"
+        )
+        todo.title = "Edited"
+        assert todo.created_at == created_time
+
+    def test_edit_todo_title_to_empty_string(self):
+        """Test editing a todo title to empty string."""
+        todo = TodoItem(
+            title="Non-empty",
+            owner="user1",
+            created_at="2024-01-01T10:00:00",
+            updated_at="2024-01-01T10:00:00"
+        )
+        todo.title = ""
+        assert todo.title == ""
+
+    def test_edit_todo_title_with_special_characters(self):
+        """Test editing a todo with special characters in title."""
+        todo = TodoItem(
+            title="Original",
+            owner="user1",
+            created_at="2024-01-01T10:00:00",
+            updated_at="2024-01-01T10:00:00"
+        )
+        new_title = "Task: #2 @Office (Urgent!)"
+        todo.title = new_title
+        assert todo.title == new_title
+
+    def test_edit_todo_details_with_multiline_text(self):
+        """Test editing todo details with multiline text."""
+        todo = TodoItem(
+            title="Test",
+            details="Single line",
+            created_at="2024-01-01T10:00:00",
+            updated_at="2024-01-01T10:00:00"
+        )
+        multiline_details = "Line 1\nLine 2\nLine 3\nLine 4"
+        todo.details = multiline_details
+        assert todo.details == multiline_details
+
+    def test_edit_todo_and_serialize_to_dict(self):
+        """Test editing a todo and then serializing to dict."""
+        todo = TodoItem(
+            title="Original",
+            priority=Priority.LOW,
+            status=Status.PENDING,
+            owner="user1",
+            created_at="2024-01-01T10:00:00",
+            updated_at="2024-01-01T10:00:00"
+        )
+        
+        todo.title = "Edited"
+        todo.priority = Priority.HIGH
+        todo.status = Status.COMPLETED
+        
+        data = todo.to_dict()
+        assert data["title"] == "Edited"
+        assert data["priority"] == "HIGH"
+        assert data["status"] == "COMPLETED"
+        assert data["owner"] == "user1"
+
+    def test_edit_todo_deserialize_and_edit(self):
+        """Test deserializing a todo from dict and editing it."""
+        data = {
+            "id": "test-id",
+            "title": "Original",
+            "details": "Original details",
+            "priority": "LOW",
+            "status": "PENDING",
+            "owner": "user1",
+            "created_at": "2024-01-01T10:00:00",
+            "updated_at": "2024-01-01T10:00:00"
+        }
+        
+        todo = TodoItem.from_dict(data)
+        todo.title = "Edited"
+        todo.details = "Edited details"
+        todo.priority = Priority.HIGH
+        
+        assert todo.title == "Edited"
+        assert todo.details == "Edited details"
+        assert todo.priority == Priority.HIGH
+        assert todo.id == "test-id"
+
+    def test_edit_todo_chain_modifications(self):
+        """Test making a series of edits to a todo."""
+        todo = TodoItem(
+            title="Task",
+            priority=Priority.LOW,
+            owner="user1",
+            created_at="2024-01-01T10:00:00",
+            updated_at="2024-01-01T10:00:00"
+        )
+        
+        todo.title = "Updated Task"
+        assert todo.title == "Updated Task"
+        
+        todo.priority = Priority.MID
+        assert todo.priority == Priority.MID
+        
+        todo.status = Status.COMPLETED
+        assert todo.status == Status.COMPLETED
+        
+        assert todo.title == "Updated Task"
+        assert todo.priority == Priority.MID
+        assert todo.status == Status.COMPLETED
+
+    def test_edit_todo_with_long_details(self):
+        """Test editing a todo with very long details."""
+        long_details = "This is a long detailed description. " * 50
+        todo = TodoItem(
+            title="Test",
+            details="Short",
+            created_at="2024-01-01T10:00:00",
+            updated_at="2024-01-01T10:00:00"
+        )
+        todo.details = long_details
+        assert todo.details == long_details
+
+    def test_create_and_edit_workflow(self):
+        """Test a typical workflow of creating and editing a todo."""
+        todo = TodoItem(
+            title="Finish project",
+            details="",
+            priority=Priority.MID,
+            status=Status.PENDING,
+            owner="developer1",
+            created_at="2024-01-01T10:00:00",
+            updated_at="2024-01-01T10:00:00"
+        )
+        
+        todo.details = "Complete the development and testing of feature X"
+        assert todo.details == "Complete the development and testing of feature X"
+        
+        todo.priority = Priority.HIGH
+        assert todo.priority == Priority.HIGH
+        
+        todo.updated_at = "2024-01-02T14:30:00"
+        assert todo.updated_at == "2024-01-02T14:30:00"
+        
+        todo.status = Status.COMPLETED
+        assert todo.status == Status.COMPLETED
+        
+        assert todo.title == "Finish project"
+        assert todo.owner == "developer1"
