@@ -139,7 +139,7 @@ def main():
                 elif choice == "3":
                     result = calc.multiply(num1, num2)
                     operation = "*"
-                else:  # choice == "4"
+                elif  choice == "4"
                     result = calc.divide(num1, num2)
                     operation = "/"
                 
