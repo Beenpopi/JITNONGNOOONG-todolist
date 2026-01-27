@@ -64,41 +64,61 @@ def divide(a: float, b: float) -> float:
     return a / b
 
 
+def calculate_velocity(distance: float, time: float) -> float:
+    """
+    Calculate velocity from distance and time.
+
+    Args:
+        distance: Distance traveled
+        time: Time taken
+
+    Returns:
+        Velocity (distance / time)
+
+    Raises:
+        ValueError: If time is zero or negative
+    """
+    if time <= 0:
+        raise ValueError("Time must be greater than zero")
+    return distance / time
+
+
 def main():
     """Main function to run the calculator interactively."""
     print("Simple Calculator")
-    print("Operations: add, subtract, multiply, divide")
+    print("Operations: add, subtract, multiply, divide, velocity")
     print("Type 'quit' to exit")
 
     while True:
-        operation = input("\nEnter operation (add/subtract/multiply/divide) or 'quit': ").strip().lower()
+        operation = input("\nEnter operation (add/subtract/multiply/divide/velocity) or 'quit': ").strip().lower()
 
         if operation == "quit":
             print("Goodbye!")
             break
 
-        if operation not in ["add", "subtract", "multiply", "divide"]:
-            print("Invalid operation. Please choose: add, subtract, multiply, or divide")
+        if operation not in ["add", "subtract", "multiply", "divide", "velocity"]:
+            print("Invalid operation. Please choose: add, subtract, multiply, divide, or velocity")
             continue
 
         try:
-            a = float(input("Enter first number: "))
-            b = float(input("Enter second number: "))
-        except ValueError:
-            print("Invalid input. Please enter valid numbers.")
-            continue
+            if operation == "velocity":
+                distance = float(input("Enter distance: "))
+                time = float(input("Enter time: "))
+                result = calculate_velocity(distance, time)
+                print(f"Result: Velocity = {distance} / {time} = {result}")
+            else:
+                a = float(input("Enter first number: "))
+                b = float(input("Enter second number: "))
+                if operation == "add":
+                    result = add(a, b)
+                elif operation == "subtract":
+                    result = subtract(a, b)
+                elif operation == "multiply":
+                    result = multiply(a, b)
+                elif operation == "divide":
+                    result = divide(a, b)
 
-        try:
-            if operation == "add":
-                result = add(a, b)
-            elif operation == "subtract":
-                result = subtract(a, b)
-            elif operation == "multiply":
-                result = multiply(a, b)
-            elif operation == "divide":
-                result = divide(a, b)
-
-            print(f"Result: {a} {operation} {b} = {result}")
+                print(f"Result: {a} {operation} {b} = {result}")
         except ValueError as e:
             print(f"Error: {e}")
 
