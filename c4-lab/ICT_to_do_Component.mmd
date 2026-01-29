@@ -1,0 +1,29 @@
+C4Component
+    title ICT To Do List System - C4 Component Diagram
+
+    Container(webApp, "Web Application", "React/Vue")
+    Container(mobileApp, "Mobile Application", "React Native/Flutter")
+    ContainerDb(database, "Database", "PostgreSQL")
+    System_Ext(myCourses, "MyCourses", "External ICT e-learning system")
+
+    Container_Boundary(api, "API Server") {
+        Component(authService, "Authentication Service", "Node.js/Python", "Handles user authentication and authorization")
+        Component(taskService, "Task Management Service", "Node.js/Python", "Manages CRUD operations for tasks")
+        Component(userService, "User Management Service", "Node.js/Python", "Manages user accounts and profiles")
+        Component(assignmentService, "Assignment Sync Service", "Node.js/Python", "Synchronizes assignments from MyCourses")
+        Component(apiGateway, "API Gateway", "Express/FastAPI", "Routes requests to appropriate services")
+    }
+
+    Rel(webApp, apiGateway, "Makes API calls", "HTTPS/JSON")
+    Rel(mobileApp, apiGateway, "Makes API calls", "HTTPS/JSON")
+
+    Rel(apiGateway, authService, "Routes authentication requests to", "HTTPS/JSON")
+    Rel(apiGateway, taskService, "Routes task requests to", "HTTPS/JSON")
+    Rel(apiGateway, userService, "Routes user requests to", "HTTPS/JSON")
+    Rel(apiGateway, assignmentService, "Routes sync requests to", "HTTPS/JSON")
+
+    Rel(authService, database, "Reads/writes user credentials", "SQL")
+    Rel(taskService, database, "Reads/writes tasks via", "SQL")
+    Rel(userService, database, "Reads/writes user data via", "SQL")
+    Rel(assignmentService, database, "Reads/writes assignments via", "SQL")
+    Rel(assignmentService, myCourses, "Retrieves assignments via", "HTTPS/JSON")
