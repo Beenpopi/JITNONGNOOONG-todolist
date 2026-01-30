@@ -1,0 +1,29 @@
+
+C4Container
+    title ICT To Do List System - C4 Container Diagram
+
+    Person(student, "Student", "Creates, manages, and tracks personal tasks and assignments")
+    Person(instructor, "Instructor", "Views teaching-related tasks and assignment deadlines")
+    Person(admin, "System Administrator", "Manages system configuration and user accounts")
+    
+    System_Boundary(ictSystem, "ICT To Do List System") {
+        Container(webApp, "Web Application", "React/Vue", "Provides task management interface for students, instructors, and administrators via browser")
+        Container(mobileApp, "Mobile Application", "React Native/Flutter", "Provides task management interface for students via mobile devices")
+        Container(api, "API Server", "Python/Node.js", "Provides REST API for managing tasks, users, and system configuration")
+        ContainerDb(database, "Database", "PostgreSQL", "Stores users, tasks, assignments, and system configuration")
+    }
+    
+    System_Ext(myCourses, "MyCourses", "External ICT e-learning system")
+    
+    Rel(student, webApp, "Uses", "HTTPS")
+    Rel(student, mobileApp, "Uses", "[HTTPS]")
+    Rel(instructor, webApp, "Uses", "[HTTPS]")
+    Rel(admin, webApp, "Uses", "[HTTPS]")
+
+    Rel(webApp, api, "Makes API calls", "[HTTPS/JSON]")
+    Rel(mobileApp, api, "Makes API calls", "[HTTPS/JSON]")
+    
+    Rel(api, database, "Reads from and writes to", "[SQL]")
+    Rel(api, myCourses, "Retrieves courses and assignments", "[HTTPS/JSON]")
+    Rel(myCourses, api, "Sends assignment and submission data", "[HTTPS/JSON]")
+

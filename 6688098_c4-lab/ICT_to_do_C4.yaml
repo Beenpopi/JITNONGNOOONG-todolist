@@ -1,0 +1,151 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/SlavaVedernikov/C4InterFlow/refs/heads/master/C4InterFlow/schema.json
+ICTtodo:
+  SoftwareSystems:
+    ICTtodosystem:
+      Label: ICT_to_do_system
+      Containers:
+        APIServer:
+          Technology: Python/Node.js
+          ContainerType: Api
+          Components:
+            AuthenticationService:
+              Technology: Node.js/Python
+              Interfaces:
+                Routesauthentication:
+                  Description: Interface for Authentication Service
+                  Protocol: HTTPS/JSON
+                Readswritesusercredentials:
+                  Label: Reads/writes user credentials
+                  Flows:
+                    - Type: Use
+                      Expression: Containers.Database.Interfaces.Readswritesusercredentials
+            TaskManagementService:
+              Technology: Node.js/Python
+              Interfaces:
+                Routestaskrequests:
+                  Description: Interface for Task Management Service
+                Readswritestasks:
+                  Label: Reads/writes tasks
+                  Flows:
+                    - Type: Use
+                      Expression: Containers.Database.Interfaces.Readswritestasks
+            UserManagementService:
+              Technology: Node.js/Python
+              Interfaces:
+                Routesuserrequests:
+                  Description: Interface for User Management Service
+                Readswritesuserdata:
+                  Label: Reads/writes user data
+                  Flows:
+                    - Type: Use
+                      Expression: Containers.Database.Interfaces.Readswritesuserdata
+            AssignmentSyncService:
+              Technology: Node.js/Python
+              Interfaces:
+                Routessyncrequests:
+                  Description: Interface for Assignment Sync Service
+                Readswritesassignments:
+                  Label: Reads/writes assignments
+                  Flows:
+                    - Type: Use
+                      Expression: Containers.Database.Interfaces.Readswritesassignments
+                Retrievesassignments:
+                  Flows:
+                    - Type: Use
+                      Expression: ..MyCourses.Interfaces.Retrievesassignments
+                Sendsassignmentandsubmissiondata:
+                  Description: Interface for Assignment Sync Service
+            APIGateway:
+              Technology: Express/FastAPI
+              Interfaces:
+                MakesAPIcalls:
+                  Description: Interface for API Gateway
+                Routessyncrequests:
+                  Flows:
+                    - Type: Use
+                      Expression: APIServer.Components.AssignmentSyncService.Interfaces.Routessyncrequests
+                Routesauthentication:
+                  Flows:
+                    - Type: Use
+                      Expression: APIServer.Components.AuthenticationService.Interfaces.Routesauthentication
+                Routestaskrequests:
+                  Flows:
+                    - Type: Use
+                      Expression: APIServer.Components.TaskManagementService.Interfaces.Routestaskrequests
+                Routesuserrequests:
+                  Flows:
+                    - Type: Use
+                      Expression: APIServer.Components.UserManagementService.Interfaces.Routesuserrequests
+        WebApplication:
+          Technology: React/Vue
+          ContainerType: Web Application
+          Interfaces:
+            Uses:
+              Description: Interface for Web Application
+            MakeAPIcalls:
+              Flows:
+                - Type: Use
+                  Expression: Containers.APIServer.Components.APIGateway.Interfaces.MakesAPIcalls
+        MobileApplication:
+          Technology: React Native/Flutter
+          ContainerType: Mobile
+          Interfaces:
+            Uses:
+              Description: Interface for Mobile Application
+            MakeAPIcalls:
+              Flows:
+                - Type: Use
+                  Expression: Containers.APIServer.Components.APIGateway.Interfaces.MakesAPIcalls
+        Database:
+          Technology: PostgreSQL
+          ContainerType: Database
+          Interfaces:
+            Readswritesusercredentials:
+              Label: Reads/writes user credentials
+              Description: Interface for Database
+            Readswritestasks:
+              Label: Reads/writes tasks
+              Description: Interface for Database
+            Readswritesuserdata:
+              Label: Reads/writes user data
+              Description: Interface for Database
+            Readswritesassignments:
+              Label: Reads/writes assignments
+              Description: Interface for Database
+    MyCourses:
+      Interfaces:
+        Retrievescoursesassignmentsandsubmissionstatus:
+          Label: Retrieves courses, assignments, and submission status
+          Description: Interface for MyCourses
+        Returnsassignmentandsubmissiondata:
+          Flows:
+            - Type: Use
+        Retrievesassignments:
+          Description: Interface for MyCourses
+        Sendsassignmentandsubmissiondata:
+          Flows:
+            - Type: Use
+              Expression: ..ICTtodosystem.Containers.APIServer.Components.AssignmentSyncService.Interfaces.Sendsassignmentandsubmissiondata
+  Actors:
+    Student:
+      Activities:
+        UseWebApp:
+          Flows:
+            - Type: Use
+              Expression: ..ICTtodosystem.Containers.WebApplication.Interfaces.Uses
+        UseMobileApp:
+          Flows:
+            - Type: Use
+              Expression: ..ICTtodosystem.Containers.MobileApplication.Interfaces.Uses
+    Instructor:
+      Activities:
+        UseWebApp:
+          Flows:
+            - Type: Use
+              Expression: ..ICTtodosystem.Containers.WebApplication.Interfaces.Uses
+    Admin:
+      Activities:
+        UseWebApp:
+          Flows:
+            - Type: Use
+              Expression: ..ICTtodosystem.Containers.WebApplication.Interfaces.Uses
