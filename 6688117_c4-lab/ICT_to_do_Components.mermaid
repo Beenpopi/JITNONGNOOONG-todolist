@@ -1,0 +1,21 @@
+flowchart LR
+  subgraph WebAPI["Web API (FastAPI) — Components"]
+    Auth["Authentication & Authorization\n(login, token validation, access control)"]
+    TaskMgmt["Task Management\n(CRUD manual/imported tasks)"]
+    SyncOrch["MyCourses Sync Orchestrator\n(sync workflow + update rules)"]
+    MyCoursesClient["MyCourses Client\n(HTTPS requests + JSON parsing)"]
+    Mapper["Mapping Component\n(MyCourses data → internal Task model)"]
+    SyncHistory["Sync History Component\n(log sync result, timestamp, errors)"]
+    DataAccess["Data Access / Repositories\n(ORM/SQLAlchemy, transactions)"]
+  end
+
+  External["MyCourses API"]
+  DB[(PostgreSQL)]
+
+  %% Typical call paths
+  TaskMgmt --> DataAccess --> DB
+  Auth --> DataAccess
+  SyncOrch --> MyCoursesClient -->|HTTPS/JSON| External
+  SyncOrch --> Mapper
+  SyncOrch --> DataAccess
+  SyncOrch --> SyncHistory --> DataAccess

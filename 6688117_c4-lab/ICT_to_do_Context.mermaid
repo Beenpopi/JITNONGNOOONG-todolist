@@ -1,0 +1,25 @@
+---
+config:
+    graph:
+        useMaxWidth: true
+---
+graph TB
+    Student["👤 Student<br/>Primary User"]
+    Instructor["👤 Instructor<br/>Teaching Staff"]
+    Admin["👤 System Administrator<br/>Operations"]
+    
+    TodoSystem["🎯 ICT To Do List<br/>(Task Management System)"]
+    
+    MyCourses["📚 MyCourses<br/>(External E-Learning Platform)"]
+    
+    Student -->|Manages personal<br/>& course tasks| TodoSystem
+    Instructor -->|Views teaching<br/>task overview| TodoSystem
+    Admin -->|System configuration<br/>& account management| TodoSystem
+    
+    TodoSystem -->|Retrieves courses,<br/>assignments, submission status<br/>HTTPS/JSON| MyCourses
+    
+    style TodoSystem fill:#1168bd,stroke:#003c8f,stroke-width:3px,color:#fff,font-weight:bold
+    style Student fill:#999999,stroke:#666666,stroke-width:2px,color:#fff
+    style Instructor fill:#999999,stroke:#666666,stroke-width:2px,color:#fff
+    style Admin fill:#999999,stroke:#666666,stroke-width:2px,color:#fff
+    style MyCourses fill:#999999,stroke:#666666,stroke-width:2px,color:#fff

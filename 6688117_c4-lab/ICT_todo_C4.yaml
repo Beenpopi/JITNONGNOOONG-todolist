@@ -1,0 +1,200 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/SlavaVedernikov/C4InterFlow/refs/heads/master/C4InterFlow/schema.json
+ICTtodo:
+  SoftwareSystems:
+    ICTToDoListSystem:
+      Label: ICT To Do List (Task Management System)
+
+      Containers:
+        WebApplication:
+          Technology: React/Vue
+          ContainerType: Web Application
+          Interfaces:
+            Uses:
+              Description: Student/Instructor/Admin uses the web UI
+
+            MakesAPICalls:
+              Description: Web UI calls Web API
+              Protocol: HTTPS/JSON
+              Flows:
+                - Type: Use
+                  Expression: Containers.WebAPI.Interfaces.PublicAPI
+
+        MobileApplication:
+          Technology: React Native/Flutter
+          ContainerType: Mobile
+          Interfaces:
+            Uses:
+              Description: Student uses the mobile UI
+
+            MakesAPICalls:
+              Description: Mobile UI calls Web API
+              Protocol: HTTPS/JSON
+              Flows:
+                - Type: Use
+                  Expression: Containers.WebAPI.Interfaces.PublicAPI
+
+        WebAPI:
+          Technology: FastAPI/Express (Python/Node.js)
+          ContainerType: Api
+          Interfaces:
+            PublicAPI:
+              Description: Public REST API for clients (Web/Mobile)
+              Protocol: HTTPS/JSON
+
+            ReadsWritesData:
+              Description: Reads/writes application data
+              Flows:
+                - Type: Use
+                  Expression: Containers.Database.Interfaces.Persistence
+
+          Components:
+            AuthenticationService:
+              Technology: Node.js/Python
+              Interfaces:
+                AuthEndpoints:
+                  Description: Login/register/token validation endpoints
+                  Protocol: HTTPS/JSON
+                  Flows:
+                    - Type: Use
+                      Expression: ..APIGateway.Interfaces.RouteAuthentication
+
+                ReadsWritesCredentials:
+                  Label: Reads/writes user credentials
+                  Flows:
+                    - Type: Use
+                      Expression: Containers.Database.Interfaces.Credentials
+
+            TaskManagementService:
+              Technology: Node.js/Python
+              Interfaces:
+                TaskEndpoints:
+                  Description: CRUD tasks endpoints
+                  Protocol: HTTPS/JSON
+                  Flows:
+                    - Type: Use
+                      Expression: ..APIGateway.Interfaces.RouteTasks
+
+                ReadsWritesTasks:
+                  Label: Reads/writes tasks
+                  Flows:
+                    - Type: Use
+                      Expression: Containers.Database.Interfaces.Tasks
+
+            UserManagementService:
+              Technology: Node.js/Python
+              Interfaces:
+                UserEndpoints:
+                  Description: Manage user profiles/settings endpoints
+                  Protocol: HTTPS/JSON
+                  Flows:
+                    - Type: Use
+                      Expression: ..APIGateway.Interfaces.RouteUsers
+
+                ReadsWritesUsers:
+                  Label: Reads/writes user data
+                  Flows:
+                    - Type: Use
+                      Expression: Containers.Database.Interfaces.Users
+
+            AssignmentSyncService:
+              Technology: Node.js/Python
+              Interfaces:
+                SyncEndpoints:
+                  Description: Trigger/monitor sync jobs
+                  Protocol: HTTPS/JSON
+                  Flows:
+                    - Type: Use
+                      Expression: ..APIGateway.Interfaces.RouteSync
+
+                ReadsWritesAssignments:
+                  Label: Reads/writes assignments
+                  Flows:
+                    - Type: Use
+                      Expression: Containers.Database.Interfaces.Assignments
+
+                RetrievesFromMyCourses:
+                  Description: Retrieves courses/assignments/submission status from MyCourses
+                  Protocol: HTTPS/JSON
+                  Flows:
+                    - Type: Use
+                      Expression: ..MyCourses.Interfaces.RetrieveCourseAssignmentSubmissionStatus
+
+            APIGateway:
+              Technology: Express/FastAPI
+              Interfaces:
+                RouteAuthentication:
+                  Description: Routes authentication requests to AuthenticationService
+
+                RouteTasks:
+                  Description: Routes task requests to TaskManagementService
+
+                RouteUsers:
+                  Description: Routes user requests to UserManagementService
+
+                RouteSync:
+                  Description: Routes sync requests to AssignmentSyncService
+
+        Database:
+          Technology: PostgreSQL
+          ContainerType: Database
+          Interfaces:
+            Persistence:
+              Description: General persistence interface (tables, indexes, queries)
+
+            Credentials:
+              Label: Reads/writes user credentials
+              Description: Store password hashes/tokens/credential records
+
+            Tasks:
+              Label: Reads/writes tasks
+              Description: Store tasks (personal + course tasks)
+
+            Users:
+              Label: Reads/writes user data
+              Description: Store user profiles/settings/roles
+
+            Assignments:
+              Label: Reads/writes assignments
+              Description: Store synced assignments + submission status
+
+    MyCourses:
+      Label: MyCourses (External E-Learning Platform)
+      Interfaces:
+        RetrieveCourseAssignmentSubmissionStatus:
+          Label: Retrieves courses, assignments, and submission status
+          Description: MyCourses API used by ICT To Do List
+          Protocol: HTTPS/JSON
+
+  Actors:
+    Student:
+      Label: Student (Primary User)
+      Activities:
+        UsesWebApp:
+          Description: Manages personal & course tasks (web)
+          Flows:
+            - Type: Use
+              Expression: ..ICTToDoListSystem.Containers.WebApplication.Interfaces.Uses
+
+        UsesMobileApp:
+          Description: Manages personal & course tasks (mobile)
+          Flows:
+            - Type: Use
+              Expression: ..ICTToDoListSystem.Containers.MobileApplication.Interfaces.Uses
+
+    Instructor:
+      Label: Instructor (Teaching Staff)
+      Activities:
+        UsesWebApp:
+          Description: Views teaching task overview
+          Flows:
+            - Type: Use
+              Expression: ..ICTToDoListSystem.Containers.WebApplication.Interfaces.Uses
+
+    SystemAdministrator:
+      Label: System Administrator (Operations)
+      Activities:
+        UsesWebApp:
+          Description: System configuration & account management
+          Flows:
+            - Type: Use
+              Expression: ..ICTToDoListSystem.Containers.WebApplication.Interfaces.Uses

@@ -1,0 +1,30 @@
+flowchart LR
+  subgraph Users
+    Student["Student"]
+    Instructor["Instructor"]
+    SysAdmin["System Administrator"]
+  end
+
+  subgraph System["ICT To Do List"]
+    WebApp["Web App (React)\nSPA"]
+    MobileApp["Mobile App (Flutter)\nCross-platform"]
+    WebAPI["Web API (Python, FastAPI)\nREST JSON over HTTPS"]
+    Database[(PostgreSQL)]
+    Connector["MyCourses Connector (Python)\nIntegration module (backend deployment)"]
+  end
+
+  MyCourses(("MyCourses\nExternal E-learning System"))
+
+  Student -->|Uses HTTPS| WebApp
+  Student -->|Uses HTTPS| MobileApp
+  Instructor -->|Uses HTTPS| WebApp
+  Instructor -->|Uses HTTPS| MobileApp
+  SysAdmin -->|Admin interface HTTPS| WebApp
+
+
+WebApp -->|JSON/HTTPS| WebAPI
+MobileApp -->|JSON/HTTPS| WebAPI
+WebAPI -->|Reads and writes SQL via ORM such as SQLAlchemy| Database
+WebAPI -->|Calls internal backend interface| Connector
+Connector -->|HTTPS/JSON| MyCourses
+
