@@ -1,0 +1,25 @@
+C4Component
+    title C4 Component Diagram - Web API (Python FastAPI)
+    
+    Container_Boundary(webAPI, "Web API") {
+        Component(authComponent, "Authentication & Authorization", "Python", "Handles login, token validation, and access control checks")
+        Component(taskComponent, "Task Management", "Python", "Manages CRUD operations for manual and imported tasks")
+        Component(syncOrchestrator, "MyCourses Sync Orchestrator", "Python", "Manages sync workflow and decides when to call external services")
+        Component(myCoursesClient, "MyCourses Client", "Python", "Calls MyCourses web services and handles HTTPS requests and JSON parsing")
+        Component(mappingComponent, "Mapping", "Python", "Converts MyCourses assignment and submission data into internal task model")
+        Component(syncHistoryComponent, "Sync History", "Python", "Records sync outcomes and provides data for admin monitoring")
+        Component(dataAccessComponent, "Data Access", "Python", "Provides repository functions for PostgreSQL access with transaction control")
+    }
+    
+    Container(database, "Database", "PostgreSQL")
+    System_Ext(myCourses, "MyCourses", "External e-learning system")
+    
+    Rel(authComponent, dataAccessComponent, "Uses for user account access")
+    Rel(taskComponent, dataAccessComponent, "Uses for task data access")
+    Rel(syncOrchestrator, syncHistoryComponent, "Records sync results")
+    Rel(syncOrchestrator, myCoursesClient, "Calls to retrieve external data")
+    Rel(syncOrchestrator, mappingComponent, "Calls to map external data")
+    Rel(syncOrchestrator, taskComponent, "Calls to create/update tasks")
+    Rel(myCoursesClient, myCourses, "Calls web services [HTTPS/JSON]")
+    Rel(dataAccessComponent, database, "Reads/writes [SQL/ORM]")
+    Rel(syncHistoryComponent, dataAccessComponent, "Uses for sync history storage")

@@ -1,0 +1,16 @@
+C4Context
+    title C4 Context Diagram - ICT To Do List System
+    
+    Person(student, "Student", "A student managing their task list and tracking assignments")
+    Person(instructor, "Instructor", "An instructor viewing their teaching related tasks and assignment deadlines")
+    Person(admin, "System Administrator", "Managing system configuration, user accounts, and sync health")
+    
+    System(todoSystem, "ICT To Do List System", "A task management system for the ICT e-learning environment that helps students track personal tasks and automatically sync course work from MyCourses")
+    
+    System_Ext(myCourses, "MyCourses", "External ICT e-learning system that owns course, assignment, and submission data")
+    
+    Rel(student, todoSystem, "Uses via Web/Mobile App")
+    Rel(instructor, todoSystem, "Uses via Admin Interface")
+    Rel(admin, todoSystem, "Configures & Monitors")
+    
+    Rel(todoSystem, myCourses, "Retrieves courses, assignments, submission status via HTTPS/JSON web services")
