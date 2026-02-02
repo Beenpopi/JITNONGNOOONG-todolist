@@ -1,0 +1,26 @@
+
+C4Container
+    title ICT To Do List - Container Diagram
+
+    Person(student, "Student", "Manages personal tasks via web or mobile app")
+    Person(instructor, "Instructor", "Views teaching-related tasks")
+    Person(admin, "System Administrator", "Manages config and monitors sync health")
+
+    System_Boundary(todoSystem, "ICT To Do List") {
+        Container(webApp, "Web App", "React SPA", "Browser-based UI for students, instructors, admins")
+        Container(mobileApp, "Mobile App", "Flutter", "Cross-platform mobile app for students")
+        Container(webApi, "Web API", "Python + FastAPI", "Exposes REST endpoints (JSON) and orchestrates syncs")
+        Container(myCoursesConnector, "MyCourses Connector", "Python module/service", "Integration layer that calls MyCourses web services")
+        ContainerDb(database, "Database", "PostgreSQL", "Stores users, tasks, sync settings and sync history")
+    }
+
+    System_Ext(myCourses, "MyCourses", "External e-learning system (courses, assignments, submissions)")
+
+    Rel(student, webApp, "Uses", "HTTPS/JSON")
+    Rel(instructor, webApp, "Uses", "HTTPS/JSON")
+    Rel(admin, webApp, "Uses (admin interface)", "HTTPS/JSON")
+    Rel(webApp, webApi, "Calls REST API to manage tasks and request sync", "HTTPS/JSON")
+    Rel(mobileApp, webApi, "Calls REST API to manage tasks and request sync", "HTTPS/JSON")
+    Rel(webApi, database, "Reads/writes tasks, users, sync history", "SQL via ORM (SQLAlchemy)")
+    Rel(webApi, myCoursesConnector, "Requests sync and mapping", "Internal API / function calls or internal HTTP")
+    Rel(myCoursesConnector, myCourses, "Calls web services to fetch courses/assignments/submissions", "HTTPS/JSON")

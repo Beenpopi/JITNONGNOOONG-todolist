@@ -1,0 +1,57 @@
+
+C4Container
+    title ICT To Do List - Container Diagram
+
+    Person(student, "Student", "Manages personal tasks via web or mobile app")
+    Person(instructor, "Instructor", "Views teaching-related tasks")
+    Person(admin, "System Administrator", "Manages config and monitors sync health")
+
+    System_Boundary(todoSystem, "ICT To Do List") {
+        Container(webApp, "Web App", "React SPA", "Browser-based UI for students, instructors, admins")
+        Container(mobileApp, "Mobile App", "Flutter", "Cross-platform mobile app for students")
+        Container(webApi, "Web API", "Python + FastAPI", "Exposes REST endpoints (JSON) and orchestrates syncs")
+        Container(myCoursesConnector, "MyCourses Connector", "Python module/service", "Integration layer that calls MyCourses web services")
+        ContainerDb(database, "Database", "PostgreSQL", "Stores users, tasks, sync settings and sync history")
+    }
+
+    System_Ext(myCourses, "MyCourses", "External e-learning system (courses, assignments, submissions)")
+
+    Rel(student, webApp, "Uses", "HTTPS/JSON")
+    Rel(instructor, webApp, "Uses", "HTTPS/JSON")
+    Rel(admin, webApp, "Uses (admin interface)", "HTTPS/JSON")
+    Rel(webApp, webApi, "Calls REST API to manage tasks and request sync", "HTTPS/JSON")
+    Rel(mobileApp, webApi, "Calls REST API to manage tasks and request sync", "HTTPS/JSON")
+    Rel(webApi, database, "Reads/writes tasks, users, sync history", "SQL via ORM (SQLAlchemy)")
+    Rel(webApi, myCoursesConnector, "Requests sync and mapping", "Internal API / function calls or internal HTTP")
+    Rel(myCoursesConnector, myCourses, "Calls web services to fetch courses/assignments/submissions", "HTTPS/JSON")
+
+
+C4Component
+    title ICT To Do List - Web API Component Diagram
+    Container(webApi, "Web API", "Python + FastAPI", "Backend service that implements business logic and exposes REST endpoints")
+    Container(webApp, "Web App", "React SPA", "Browser-based UI for students, instructors, admins")
+
+    Component(auth, "Authentication & Authorization", "Handles login, token validation (SSO / OAuth2 / OpenID Connect), access control checks")
+    Component(taskMgmt, "Task Management", "CRUD for manual and imported tasks; enforces privacy rules")
+    Component(syncOrchestrator, "MyCourses Sync Orchestrator", "Coordinates sync workflow, deduplication, and business rules")
+    Component(myCoursesClient, "MyCourses Client", "Calls MyCourses web services, handles HTTPS and JSON parsing")
+    Component(mapping, "Mapping Component", "Maps MyCourses assignments/submissions to internal task model")
+    Component(syncHistory, "Sync History", "Records sync outcomes (timestamp, result, error details) for admin monitoring")
+    Component(dataAccess, "Data Access", "Repository layer using SQLAlchemy; transaction management and DB operations")
+    ContainerDb(database, "Database", "PostgreSQL", "Stores users, tasks, sync settings and sync history")
+
+    Rel(webApp, auth, "Authenticate / authorize requests to API", "HTTPS/JSON")
+    Rel(webApp, taskMgmt, "Uses to create/edit/delete/mark tasks", "HTTPS/JSON")
+    Rel(webApp, syncOrchestrator, "Triggers manual syncs", "HTTPS/JSON")
+    Rel(auth, dataAccess, "Validates tokens / loads user", "SQL")
+    Rel(taskMgmt, dataAccess, "Reads/writes tasks and user data", "SQL via SQLAlchemy")
+    Rel(syncOrchestrator, myCoursesClient, "Calls to fetch courses/assignments/submissions", "HTTPS/JSON")
+    Rel(myCoursesClient, mapping, "Converts external data to internal model", "")
+    Rel(mapping, dataAccess, "Persists imported tasks, links assignments (MyCourses ID)", "SQL via SQLAlchemy")
+    Rel(syncOrchestrator, syncHistory, "Records sync start/result/errors", "Writes to DB")
+    Rel(syncHistory, dataAccess, "Persists sync log entries", "SQL")
+
+    Boundary(externalDb, "External Dependencies") {
+        Rel(dataAccess, database, "Reads/Writes", "PostgreSQL (SQL)")
+    }
+
