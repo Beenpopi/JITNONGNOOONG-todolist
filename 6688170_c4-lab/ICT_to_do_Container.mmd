@@ -1,0 +1,27 @@
+C4Container
+    title C4 Container Diagram - ICT To Do List System
+    
+    Person(student, "Student", "A student managing their task list and tracking assignments")
+    Person(instructor, "Instructor", "An instructor viewing teaching-related tasks and assignment deadlines")
+    Person(admin, "System Administrator", "Managing system configuration, user accounts, and sync health")
+    
+    System_Boundary(ictSystem, "ICT To Do List System") {
+        Container(webApp, "Web App", "React SPA", "Single page application providing task management interface for web users")
+        Container(mobileApp, "Mobile App", "Flutter", "Cross-platform mobile application for iOS and Android")
+        Container(webAPI, "Web API", "Python FastAPI", "Backend service exposing REST endpoints for task management and MyCourses synchronization")
+        Container(database, "Database", "PostgreSQL", "Stores user profiles, tasks, sync settings, and sync history")
+        Container(myCoursesConnector, "MyCourses Connector", "Python Module", "Integration module for retrieving courses, assignments, and submission status from MyCourses")
+    }
+    
+    System_Ext(myCourses, "MyCourses", "External ICT e-learning system owning course and assignment data")
+    
+    Rel(student, webApp, "Uses via browser")
+    Rel(student, mobileApp, "Uses")
+    Rel(instructor, webApp, "Uses admin interface")
+    Rel(admin, webApp, "Configures system")
+    
+    Rel(webApp, webAPI, "Makes API calls [HTTPS/JSON]")
+    Rel(mobileApp, webAPI, "Makes API calls [HTTPS/JSON]")
+    Rel(webAPI, database, "Reads/writes data [SQL/ORM]")
+    Rel(webAPI, myCoursesConnector, "Calls for sync operations")
+    Rel(myCoursesConnector, myCourses, "Retrieves courses, assignments, submission status [HTTPS/JSON]")
